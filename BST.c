@@ -135,8 +135,8 @@ node_ptr* findNode_ptr(tree_ptr* tree, element item)
             printf("Find Failed.\n");
             break;
         }
-        if(item < curr -> key) curr = curr -> right;
-        else if (item > curr -> key) curr = curr -> left;
+        if(item < curr -> key) curr = curr -> left;
+        else if (item > curr -> key) curr = curr -> right;
         else break;
     }
     return curr;
@@ -144,15 +144,15 @@ node_ptr* findNode_ptr(tree_ptr* tree, element item)
 
 node_ptr* findLeftChild_ptr(tree_ptr* tree, node_ptr* target)
 {
-    return target -> left;
+    return (target == NULL) ? NULL : target -> left;
 }
 node_ptr* findRightChild_ptr(tree_ptr* tree, node_ptr* target)
 {
-    return target -> right;
+    return (target == NULL) ? NULL : target -> right;
 }
 node_ptr* findParent_ptr(tree_ptr* tree, node_ptr* target)
 {
-    return target -> parent;
+    return (target == NULL) ? NULL : target -> parent;
 }
 
 
@@ -160,7 +160,13 @@ void traverseNode_ptr(node_ptr* root)
 {
     if(root == NULL) return;
     traverseNode_ptr(root -> left);
-    printf("%d ", root -> key);
+    if(root -> left == NULL) printf("[NULL]");
+    else printf("[ %d ]", root -> left -> key);
+    printf("\t<-\t");
+    printf("[ %d ] ", root -> key);
+    printf("\t->\t");
+    if(root -> right == NULL) printf("[NULL]\n");
+    else printf("[ %d ]\n", root -> right -> key);
     traverseNode_ptr(root -> right);
 }
 
@@ -226,11 +232,30 @@ void insert_arr(tree_arr* tree, element item)
     }
 }
 
+void moveNode(tree_arr* tree, int fromNode, int toNode)
+{
+    tree -> arr[toNode] = tree -> arr[fromNode];
+    if(tree -> arr[toNode] == null) return;
+
+    int leftFrom = findLeftChild_arr(tree, fromNode);
+    int rightFrom = findRightChild_arr(tree, fromNode);
+    int leftTo = findLeftChild_arr(tree, toNode);
+    int rightTo = findRightChild_arr(tree, toNode);
+
+    tree -> arr[leftTo] = tree -> arr[leftFrom];
+    tree -> arr[rightTo] = tree -> arr[rightTo];
+
+    moveNode(tree, leftFrom, leftTo);
+    moveNode(tree, rightFrom, rightTo);
+    
+}
+
+// insert 15, 10, 25, 22, 21, 20, 24, 23 한 뒤 delete 25하면 24랑 23이 사라짐
 void delete_arr(tree_arr* tree, element item)
 {
     if(item == null) return;
     int target = 1;
-    while(tree -> arr[target] == item){
+    while(tree -> arr[target] != item){
         if(tree -> arr[target] == null){
             printf("There is not exist '%d'", item);
             return;
@@ -245,23 +270,29 @@ void delete_arr(tree_arr* tree, element item)
 
     int left = findLeftChild_arr(tree, target);
     int right = findRightChild_arr(tree, target);
-    int temp = null;
+    int temp;
 
-    if (left == null){
-        temp = tree -> arr[right];
+    if (tree -> arr[left] == null && tree -> arr[right] == null){
+        tree -> arr[target] = null;
+        return;
     }
-    else if (right == null){
-        temp = tree -> arr[left];
+    else if (tree -> arr[left] == null){
+        temp = right;
+        moveNode(tree, temp, target);
+    }
+    else if (tree -> arr[right] == null){
+        temp = left;
+        moveNode(tree, temp, target);
     }
     else{
-        int tempIdx = right;
-        while(tree -> arr[findLeftChild_arr(tree, tempIdx)] != null){
-            tempIdx = findLeftChild_arr(tree, tempIdx);
+        temp = right;
+        while(tree -> arr[findLeftChild_arr(tree, temp)] != null){
+            temp = findLeftChild_arr(tree, temp);
         }
-        temp = tree -> arr[tempIdx];
+        int val = tree -> arr[temp];
+        delete_arr(tree, val);
+        tree -> arr[target] = val;
     }
-    delete_arr(tree, temp);
-    tree -> arr[target] = temp;
 }
 
 int findNode_arr(tree_arr* tree, element item)
@@ -299,7 +330,15 @@ void inorderTraverseNode_arr(tree_arr* tree, int index)
 {
     if(tree -> arr[index] == null) return;
     inorderTraverseNode_arr(tree, findLeftChild_arr(tree, index));
-    printf("%d ", tree -> arr[index]);
+
+    if(tree -> arr[findLeftChild_arr(tree, index)] == null) printf("[NULL]");
+    else printf("[ %d ]", tree -> arr[findLeftChild_arr(tree, index)]);
+    printf("\t<-\t");
+    printf("[ %d ] ", tree -> arr[index]);
+    printf("\t->\t");
+    if(tree -> arr[findRightChild_arr(tree, index)] == null) printf("[NULL]\n");
+    else printf("[ %d ]\n", tree -> arr[findRightChild_arr(tree, index)]);
+
     inorderTraverseNode_arr(tree, findRightChild_arr(tree, index));
 }
 
@@ -345,7 +384,6 @@ int main(void){
                 if(strcmp(cmd, "insert") == 0){
                     int key;
                     scanf_s(" %d", &key);
-                    printf("scanned key is %d\n", key);
                     insert_arr(arrTree, key);
                 }
                 else if (strcmp(cmd, "delete") == 0){
@@ -421,5 +459,7 @@ int main(void){
             }while(strcmp(cmd, "quit") != 0);
         }
     }while(treeCmd != '3');
+
+    return 0;
 
 }
