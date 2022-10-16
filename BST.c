@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 typedef int element;
 
@@ -204,7 +204,7 @@ void insert_arr(tree_arr* tree, element item)
     int location = 1;
     while(1){
         if(location >= tree -> size){
-            realloc(tree -> arr, tree -> size * 2);
+            tree -> arr = realloc(tree -> arr, (tree -> size) * 2 * sizeof(element));
             for(size_t i = tree -> size; i < (tree -> size) * 2; i++)
                 tree -> arr[i] = null;
             tree -> size = (tree -> size) * 2;
@@ -214,10 +214,10 @@ void insert_arr(tree_arr* tree, element item)
             return;
         }
         if(item < tree -> arr[location]){
-            location = findLeftChild_arr(tree, location);
+            location = location * 2;
         }
         else if (item > tree -> arr[location]){
-            location = findRightChild_arr(tree, location);
+            location = location * 2 + 1;
         }
         else{ // there is already same key
             printf("There is already '%d'!!\n", item);
@@ -313,7 +313,7 @@ void inorderTraverse_arr(tree_arr* tree)
 
 void printCommands()
 {
-    printf("commands :\n");
+    printf("\ncommands :\n");
     printf("\tinsert (key)\n");
     printf("\tdelete (key)\n");
     printf("\tleftChild (key)\n");
@@ -326,97 +326,100 @@ void printCommands()
 
 int main(void){
     char treeCmd = '0';
-    tree_arr* arrayTree;
-    tree_ptr* pointerTree;
+    tree_arr* arrTree = (tree_arr*)malloc(sizeof(tree_arr));
+    arrTree -> arr = NULL;
+    tree_ptr* ptrTree = (tree_ptr*)malloc(sizeof(tree_ptr));
+    ptrTree -> root = NULL;
 
     do{
         printf("1. Binary Search Tree using Array.\n");
         printf("2. Binary Search Tree using Pointer.\n");
         printf("3. Exit Program.\n");
-        scanf(" %c", &treeCmd);
+        scanf_s(" %c", &treeCmd);
 
         if(treeCmd == '1'){
-            char cmd[10];
-            do{
+            char cmd[11] = "default";
+            while(strcmp(cmd, "quit") != 0){
                 printCommands();
-                scanf("%s", cmd);
-                printf("input command is %s\n", cmd);
+                scanf_s(" %s", cmd, 11);
                 if(strcmp(cmd, "insert") == 0){
                     int key;
-                    scanf(" %d", key);
-                    insert_arr(arrayTree, key);
+                    scanf_s(" %d", &key);
+                    printf("scanned key is %d\n", key);
+                    insert_arr(arrTree, key);
                 }
                 else if (strcmp(cmd, "delete") == 0){
                     int key;
-                    scanf(" %d", key);
-                    delete_arr(arrayTree, key);
+                    scanf_s(" %d", &key);
+                    delete_arr(arrTree, key);
                 }
                 else if (strcmp(cmd, "leftChild") == 0){
                     int key;
-                    scanf(" %d", key);
-                    int left = arrayTree -> arr[findLeftChild_arr(arrayTree, key)];
+                    scanf_s(" %d", &key);
+                    int left = arrTree -> arr[findLeftChild_arr(arrTree, findNode_arr(arrTree, key))];
                     if(left == null) printf("null\n");
-                    else printf("%d", left);
+                    else printf("%d\n", left);
                 }
                 else if (strcmp(cmd, "rightChild") == 0){
                     int key;
-                    scanf(" %d", key);
-                    int right = arrayTree -> arr[findRightChild_arr(arrayTree, key)];
+                    scanf_s(" %d", &key);
+                    int right = arrTree -> arr[findRightChild_arr(arrTree, findNode_arr(arrTree, key))];
                     if(right == null) printf("null\n");
-                    else printf("%d", right);
+                    else printf("%d\n", right);
                 }
                 else if (strcmp(cmd, "parent") == 0){
                     int key;
-                    scanf("%d", key);
-                    int parent = arrayTree -> arr[findParent_arr(arrayTree, key)];
+                    scanf_s(" %d", &key);
+                    int parent = arrTree -> arr[findParent_arr(arrTree, findNode_arr(arrTree, key))];
                     if(parent == null) printf("null\n");
-                    else printf("%d", parent);
+                    else printf(" %d", parent);
                 }
                 else if (strcmp(cmd, "traverse") == 0){
-                    inorderTraverse_arr(arrayTree);
+                    inorderTraverse_arr(arrTree);
                 }
-            }while(strcmp(cmd, "quit") != 0);
+            }
         }
         else if (treeCmd == '2'){
             char cmd[10];
             do{
                 printCommands();
-                scanf("%s", cmd);
+                scanf_s(" %s", cmd, 11);
                 if(strcmp(cmd, "insert") == 0){
                     int key;
-                    scanf(" %d", key);
-                    insert_ptr(pointerTree, key);
+                    scanf_s(" %d", &key);
+                    insert_ptr(ptrTree, key);
                 }
                 else if (strcmp(cmd, "delete") == 0){
                     int key;
-                    scanf(" %d", key);
-                    delete_ptr(pointerTree, key);
+                    scanf_s(" %d", &key);
+                    delete_ptr(ptrTree, key);
                 }
                 else if (strcmp(cmd, "leftChild") == 0){
                     int key;
-                    scanf(" %d", key);
-                    node_ptr* left = findLeftChild_ptr(pointerTree, findNode_ptr(pointerTree, key));
+                    scanf_s(" %d", &key);
+                    node_ptr* left = findLeftChild_ptr(ptrTree, findNode_ptr(ptrTree, key));
                     if(left == NULL) printf("null\n");
-                    else printf("%d", left -> key);
+                    else printf("%d\n", left -> key);
                 }
                 else if (strcmp(cmd, "rightChild") == 0){
                     int key;
-                    scanf(" %d", key);
-                    node_ptr* right = findRightChild_ptr(pointerTree, findNode_ptr(pointerTree, key));
+                    scanf_s(" %d", &key);
+                    node_ptr* right = findRightChild_ptr(ptrTree, findNode_ptr(ptrTree, key));
                     if(right == NULL) printf("null\n");
-                    else printf("%d", right -> key);
+                    else printf("%d\n", right -> key);
                 }
                 else if (strcmp(cmd, "parent") == 0){
                     int key;
-                    scanf("%d", key);
-                    node_ptr* parent = findParent_ptr(pointerTree, findNode_ptr(pointerTree, key));
+                    scanf_s(" %d", &key);
+                    node_ptr* parent = findParent_ptr(ptrTree, findNode_ptr(ptrTree, key));
                     if(parent == NULL) printf("null\n");
-                    else printf("%d", parent -> key);
+                    else printf("%d\n", parent -> key);
                 }
                 else if (strcmp(cmd, "traverse") == 0){
-                    inorderTraverse_ptr(pointerTree);
+                    inorderTraverse_ptr(ptrTree);
                 }
             }while(strcmp(cmd, "quit") != 0);
         }
     }while(treeCmd != '3');
+
 }
