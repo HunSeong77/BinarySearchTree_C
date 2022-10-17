@@ -83,7 +83,7 @@ void delete_ptr(tree_ptr* tree, element item)
             target = target -> right;
         }
         if(target == NULL){
-            printf("There is not exist %d\n", item);
+            printf("There not exist %d\n", item);
             return;
         }
     }
@@ -251,26 +251,26 @@ void moveTree(tree_arr* tree, int fromRoot, int toRoot)
     moveNode(tree, fromRoot, toRoot);
     // enqueue
     if(tree -> arr[findLeftChild_arr(tree, fromRoot)] != null){
-        fromQueue[rear++] = findLeftChild_arr(tree, fromRoot);
+        fromQueue[++rear] = findLeftChild_arr(tree, fromRoot);
         toQueue[rear] = findLeftChild_arr(tree, toRoot);
     }
-    if(tree -> arr[findLeftRightChild_arr(tree, fromRoot)] != null){
-        fromQueue[rear++] = findRightChild_arr(tree, fromRoot);
+    if(tree -> arr[findRightChild_arr(tree, fromRoot)] != null){
+        fromQueue[++rear] = findRightChild_arr(tree, fromRoot);
         toQueue[rear] = findRightChild_arr(tree, toRoot);
     }
     
     while(front < rear){ // !isEmpty(queue)
-    // dequeue
+        // dequeue
         int from = fromQueue[++front];
         int to = toQueue[front];
         moveNode(tree, from, to);
 
         if(tree -> arr[findLeftChild_arr(tree, from)] != null){
-            fromQueue[rear++] = findLeftChild_arr(tree, from);
+            fromQueue[++rear] = findLeftChild_arr(tree, from);
             toQueue[rear] = findLeftChild_arr(tree, to);
         }
-        if(tree -> arr[findLeftRightChild_arr(tree, from)] != null){
-            fromQueue[rear++] = findRightChild_arr(tree, from);
+        if(tree -> arr[findRightChild_arr(tree, from)] != null){
+            fromQueue[++rear] = findRightChild_arr(tree, from);
             toQueue[rear] = findRightChild_arr(tree, to);
         }
     }
@@ -287,7 +287,7 @@ void delete_arr(tree_arr* tree, element item)
     int target = 1;
     while(tree -> arr[target] != item){
         if(tree -> arr[target] == null){
-            printf("There is not exist '%d'", item);
+            printf("There not exist '%d'", item);
             return;
         }
         if(item < tree -> arr[target]){
