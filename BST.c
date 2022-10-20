@@ -5,7 +5,7 @@
 
 typedef int element;
 
-// for BST made by pointer
+// Pointer-implemented Binary Search Tree
 
 typedef struct node_ptr{
     element key;
@@ -96,24 +96,39 @@ void delete_ptr(tree_ptr* tree, element item)
         else{
             tree -> root = NULL;
         }
+        free(target);
     }
     else if (target -> left == NULL){
         if(parent != NULL){
-            if(parent -> left == target) parent -> left = target -> right;
-            else parent -> right = target -> right;
+            if(parent -> left == target) {
+                parent -> left = target -> right;
+                parent -> left -> parent = parent;
+            }
+            else {
+                parent -> right = target -> right;
+                parent -> right -> parent = parent;
+            }
         }
         else{
             tree -> root = target -> right;
+            tree -> root -> parent = NULL;
         }
         free(target);
     }
     else if (target -> right == NULL){
         if(parent != NULL){
-            if(parent -> left == target) parent -> left = target -> left;
-            else parent -> right = target -> left;
+            if(parent -> left == target){
+            parent -> left = target -> left;
+            parent -> left -> parent = parent;
+            } 
+            else {
+                parent -> right = target -> left;
+                parent -> right -> parent = parent;
+            }
         }
         else{
             tree -> root = target -> left;
+            tree -> root -> parent = NULL;
         }
         free(target);
     }
@@ -160,13 +175,7 @@ void traverseNode_ptr(node_ptr* root)
 {
     if(root == NULL) return;
     traverseNode_ptr(root -> left);
-    if(root -> left == NULL) printf("[NULL]");
-    else printf("[ %d ]", root -> left -> key);
-    printf("\t<-\t");
     printf("[ %d ] ", root -> key);
-    printf("\t->\t");
-    if(root -> right == NULL) printf("[NULL]\n");
-    else printf("[ %d ]\n", root -> right -> key);
     traverseNode_ptr(root -> right);
 }
 
@@ -179,7 +188,7 @@ void inorderTraverse_ptr(tree_ptr* tree)
 
 
 
-// for BST made by array
+// Array-implemented Binary Search Tree
 
 #define null -210000000
 
@@ -280,7 +289,7 @@ void moveTree(tree_arr* tree, int fromRoot, int toRoot)
 
 }
 
-// insert 15, 10, 25, 22, 21, 20, 24, 23 한 뒤 delete 25하면 24랑 23이 사라짐
+
 void delete_arr(tree_arr* tree, element item)
 {
     if(item == null) return;
@@ -359,16 +368,9 @@ int findParent_arr(tree_arr* tree, int index)
 void inorderTraverseNode_arr(tree_arr* tree, int index)
 {
     if(tree -> arr[index] == null) return;
+    
     inorderTraverseNode_arr(tree, findLeftChild_arr(tree, index));
-
-    if(tree -> arr[findLeftChild_arr(tree, index)] == null) printf("[NULL]");
-    else printf("[ %d ]", tree -> arr[findLeftChild_arr(tree, index)]);
-    printf("\t<-\t");
     printf("[ %d ] ", tree -> arr[index]);
-    printf("\t->\t");
-    if(tree -> arr[findRightChild_arr(tree, index)] == null) printf("[NULL]\n");
-    else printf("[ %d ]\n", tree -> arr[findRightChild_arr(tree, index)]);
-
     inorderTraverseNode_arr(tree, findRightChild_arr(tree, index));
 }
 
@@ -448,7 +450,7 @@ int main(void){
             }
         }
         else if (treeCmd == '2'){
-            char cmd[10];
+            char cmd[11];
             do{
                 printCommands();
                 scanf_s(" %s", cmd, 11);
